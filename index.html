@@ -1,0 +1,2220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Behavioral Supply Chain Negotiation Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #121212;
+      --surface: rgba(20, 24, 31, 0.86);
+      --card: rgba(26, 31, 40, 0.78);
+      --glass: rgba(33, 40, 50, 0.62);
+      --stroke: rgba(255, 255, 255, 0.08);
+      --text: #f6f7fb;
+      --muted: #a7b0c0;
+      --blue: #4cc3ff;
+      --amber: #f4a62a;
+      --emerald: #23d18b;
+      --red: #ff5c5c;
+      --shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --radius-sm: 12px;
+      --glow-blue: 0 0 24px rgba(76, 195, 255, 0.3);
+      --glow-amber: 0 0 24px rgba(244, 166, 42, 0.3);
+      --glow-emerald: 0 0 24px rgba(35, 209, 139, 0.3);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Sora", "Space Grotesk", system-ui, sans-serif;
+      background: radial-gradient(circle at 10% 10%, rgba(60, 90, 140, 0.25), transparent 45%),
+        radial-gradient(circle at 90% 20%, rgba(255, 120, 60, 0.18), transparent 40%),
+        radial-gradient(circle at 50% 80%, rgba(35, 209, 139, 0.18), transparent 50%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 32px;
+    }
+
+    .app {
+      max-width: 1220px;
+      margin: 0 auto;
+      display: grid;
+      gap: 24px;
+    }
+
+    .hero {
+      padding: 26px 28px;
+      border-radius: var(--radius-lg);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+      border: 1px solid var(--stroke);
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .hero-title {
+      display: grid;
+      gap: 6px;
+    }
+
+    .hero-title h1 {
+      font-size: 28px;
+      letter-spacing: -0.5px;
+      font-weight: 700;
+    }
+
+    .hero-title p {
+      color: var(--muted);
+      font-size: 14px;
+      max-width: 520px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 12px;
+    }
+
+    .role-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      flex-wrap: wrap;
+    }
+
+    .role-toggle span {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .role-btn {
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--muted);
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 12px;
+    }
+
+    .role-btn.active {
+      color: var(--text);
+      border-color: rgba(76, 195, 255, 0.6);
+      background: rgba(76, 195, 255, 0.15);
+      box-shadow: var(--glow-blue);
+    }
+
+    .pill-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: 1px solid transparent;
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 13px;
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, rgba(76, 195, 255, 0.25), rgba(76, 195, 255, 0.05));
+      border-color: rgba(76, 195, 255, 0.4);
+      box-shadow: var(--glow-blue);
+    }
+
+    .btn.ghost {
+      border-color: rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .stage-nav {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .stage-pill {
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.04);
+      padding: 10px 16px;
+      border-radius: 999px;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--muted);
+      transition: all 0.2s ease;
+      font-size: 13px;
+    }
+
+    .stage-pill.active {
+      color: var(--text);
+      border-color: rgba(76, 195, 255, 0.6);
+      box-shadow: var(--glow-blue);
+    }
+
+    .stage {
+      display: none;
+      animation: fadeIn 0.35s ease;
+    }
+
+    .stage.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius-md);
+      padding: 18px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .card h3 {
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+
+    .subtle {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .field label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .field label span {
+      color: var(--text);
+      font-weight: 600;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--blue);
+    }
+
+    input[type="number"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 10px 12px;
+      background: rgba(15, 18, 24, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: inherit;
+    }
+
+    .input-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 110px;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .input-row input[type="number"] {
+      text-align: right;
+    }
+
+    .info-icon {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      background: transparent;
+      color: var(--muted);
+      font-size: 11px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      margin-left: 6px;
+    }
+
+    .tooltip {
+      position: fixed;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: rgba(15, 18, 24, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--text);
+      font-size: 12px;
+      max-width: 240px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(-50%, 6px);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      z-index: 30;
+    }
+
+    .tooltip.visible {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .pill-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .pill-group button {
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--muted);
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 12px;
+      transition: all 0.2s ease;
+    }
+
+    .pill-group button.active {
+      color: var(--text);
+      border-color: rgba(244, 166, 42, 0.6);
+      box-shadow: var(--glow-amber);
+    }
+
+    .role-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .role-card {
+      padding: 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.05);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .role-card.active {
+      border-color: rgba(76, 195, 255, 0.6);
+      box-shadow: var(--glow-blue);
+      color: var(--text);
+    }
+
+    .role-card span {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    .demand-preview {
+      background: rgba(10, 12, 18, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 16px;
+      margin-top: 12px;
+    }
+
+    canvas {
+      width: 100%;
+      height: 180px;
+      display: block;
+    }
+
+    .metric-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .metric {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 12px;
+      border-radius: 14px;
+      display: grid;
+      gap: 6px;
+    }
+
+    .metric strong {
+      font-size: 18px;
+    }
+
+    .negotiation-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr) minmax(0, 1fr);
+      gap: 18px;
+    }
+
+    .panel-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .panel-title span {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .profit-card {
+      background: rgba(12, 16, 22, 0.8);
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 12px;
+      margin-top: 10px;
+      display: grid;
+      gap: 6px;
+    }
+
+    .profit-card strong {
+      font-size: 20px;
+    }
+
+    .panel-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(8, 10, 14, 0.82);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px;
+      font-size: 13px;
+      color: var(--muted);
+      backdrop-filter: blur(10px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .panel-hidden .panel-overlay {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .negotiation-center {
+      display: grid;
+      gap: 14px;
+    }
+
+    .timeline {
+      display: grid;
+      gap: 10px;
+      max-height: 220px;
+      overflow: auto;
+      padding-right: 6px;
+    }
+
+    .timeline-item {
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 12px;
+      display: grid;
+      gap: 4px;
+      animation: pulseIn 0.4s ease;
+    }
+
+    @keyframes pulseIn {
+      from {
+        transform: translateY(6px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .meter {
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+    }
+
+    .meter span {
+      display: block;
+      height: 100%;
+      background: linear-gradient(90deg, var(--red), var(--amber), var(--emerald));
+      width: 50%;
+      transition: width 0.4s ease;
+    }
+
+    .concession-chart {
+      width: 100%;
+      height: 120px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .offer-summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .summary-item {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      display: grid;
+      gap: 4px;
+    }
+
+    .summary-item strong {
+      font-size: 14px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--muted);
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .tab-btn.active {
+      color: var(--text);
+      border-color: rgba(35, 209, 139, 0.6);
+      box-shadow: var(--glow-emerald);
+    }
+
+    .tab-panel {
+      display: none;
+      margin-top: 16px;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    .waterfall {
+      display: flex;
+      gap: 16px;
+      align-items: flex-end;
+      height: 180px;
+      margin-top: 16px;
+    }
+
+    .waterfall .bar {
+      flex: 1;
+      border-radius: 12px 12px 6px 6px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .waterfall .bar span {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      font-size: 12px;
+      color: var(--text);
+    }
+
+    .bar-fill {
+      width: 100%;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      border-radius: 12px 12px 6px 6px;
+      transition: height 0.5s ease;
+    }
+
+    .bar-fill.blue {
+      background: linear-gradient(180deg, rgba(76, 195, 255, 0.8), rgba(76, 195, 255, 0.2));
+    }
+
+    .bar-fill.red {
+      background: linear-gradient(180deg, rgba(255, 92, 92, 0.7), rgba(255, 92, 92, 0.2));
+    }
+
+    .bar-fill.emerald {
+      background: linear-gradient(180deg, rgba(35, 209, 139, 0.7), rgba(35, 209, 139, 0.2));
+    }
+
+    .gauge-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+    }
+
+    .gauge {
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 16px;
+      padding: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      display: grid;
+      gap: 6px;
+      justify-items: center;
+    }
+
+    .gauge svg {
+      width: 140px;
+      height: 70px;
+    }
+
+    .gauge .value {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .pareto {
+      width: 100%;
+      height: 240px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      position: relative;
+    }
+
+    .pareto svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .reveal-panel {
+      display: none;
+      margin-top: 14px;
+    }
+
+    .reveal-panel.active {
+      display: block;
+    }
+
+    .round-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(76, 195, 255, 0.1);
+      border: 1px solid rgba(76, 195, 255, 0.35);
+      font-size: 13px;
+    }
+
+    .round-banner strong {
+      color: var(--blue);
+    }
+
+    .round-flash {
+      animation: roundFlash 0.6s ease;
+    }
+
+    @keyframes roundFlash {
+      0% {
+        box-shadow: 0 0 0 rgba(76, 195, 255, 0.0);
+      }
+      50% {
+        box-shadow: 0 0 24px rgba(76, 195, 255, 0.35);
+      }
+      100% {
+        box-shadow: 0 0 0 rgba(76, 195, 255, 0.0);
+      }
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .tag.blue {
+      color: var(--blue);
+      border-color: rgba(76, 195, 255, 0.5);
+    }
+
+    .tag.amber {
+      color: var(--amber);
+      border-color: rgba(244, 166, 42, 0.5);
+    }
+
+    .tag.emerald {
+      color: var(--emerald);
+      border-color: rgba(35, 209, 139, 0.5);
+    }
+
+    .tag.red {
+      color: var(--red);
+      border-color: rgba(255, 92, 92, 0.5);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 10px 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    th {
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    tr.highlight {
+      background: rgba(35, 209, 139, 0.1);
+    }
+
+    @media (max-width: 1100px) {
+      .negotiation-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+      body {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="hero">
+      <div class="hero-title">
+        <h1>Behavioral Supply Chain Negotiation Lab</h1>
+        <p>Interactive classroom simulation for negotiation dynamics, coordination failure, and behavioral bias in supply chains.</p>
+      </div>
+      <div class="hero-actions">
+        <div class="role-toggle" id="topRoleToggle">
+          <span>You are:</span>
+          <button class="role-btn active" data-role="Buyer" type="button">Buyer</button>
+          <button class="role-btn" data-role="Supplier" type="button">Supplier</button>
+          <button class="role-btn" data-role="Instructor" type="button">Instructor</button>
+        </div>
+        <div class="pill-row">
+          <button class="btn ghost" id="resetApp">Reset</button>
+          <button class="btn ghost" id="toggleInstructor">Instructor Mode: Off</button>
+          <button class="btn primary" id="exportPdf">Export PDF Report</button>
+        </div>
+      </div>
+    </header>
+
+    <nav class="stage-nav">
+      <button class="stage-pill active" data-stage="setup">1 Scenario Setup</button>
+      <button class="stage-pill" data-stage="negotiation">2 Negotiation Room</button>
+      <button class="stage-pill" data-stage="results">3 Results Dashboard</button>
+      <button class="stage-pill" data-stage="reveal">4 Instructor Reveal</button>
+    </nav>
+
+    <section class="stage active" id="stage-setup">
+      <div class="grid-2">
+        <div class="card">
+          <h3>Scenario Setup</h3>
+          <p class="subtle">Adjust demand, cost structure, and behavioral parameters. The demand curve responds live to uncertainty.</p>
+
+          <div class="field">
+            <label>Demand Mean <span id="demandMeanValue">240</span></label>
+            <div class="input-row">
+              <input type="range" id="demandMean" min="80" max="400" step="5" value="240" />
+              <input type="number" id="demandMeanInput" min="80" max="400" step="1" value="240" inputmode="numeric" pattern="[0-9]*" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Demand Variability <span id="demandVarValue">40</span></label>
+            <div class="input-row">
+              <input type="range" id="demandVar" min="10" max="120" step="2" value="40" />
+              <input type="number" id="demandVarInput" min="10" max="120" step="1" value="40" inputmode="numeric" pattern="[0-9]*" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Distribution <span id="distributionValue">Normal</span></label>
+            <select id="distribution">
+              <option>Normal</option>
+              <option>Uniform</option>
+              <option>Right-Skewed</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label>Product Type</label>
+            <div class="pill-group" id="productType">
+              <button data-type="seasonal" class="active">Seasonal</button>
+              <button data-type="stable">Stable</button>
+              <button data-type="uncertain">High Uncertainty</button>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Cost Structure</label>
+            <div class="grid-3">
+              <div>
+                <span class="subtle">Retail Price</span>
+                <input type="number" id="priceInput" value="120" min="50" max="260" />
+              </div>
+              <div>
+                <span class="subtle">Supplier Cost</span>
+                <input type="number" id="costInput" value="52" min="10" max="140" />
+              </div>
+              <div>
+                <span class="subtle">Salvage Value</span>
+                <input type="number" id="salvageInput" value="20" min="0" max="80" />
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Behavioral Parameters</label>
+            <div class="field">
+              <label>Loss Aversion <span id="lossValue">1.20</span></label>
+              <input type="range" id="lossInput" min="0.8" max="2.0" step="0.05" value="1.2" />
+            </div>
+            <div class="field">
+              <label>Risk Aversion <span id="riskValue">1.10</span></label>
+              <input type="range" id="riskInput" min="0.8" max="2.0" step="0.05" value="1.1" />
+            </div>
+            <div class="field">
+              <label>Trust <span id="trustValue">0.60</span></label>
+              <input type="range" id="trustInput" min="0" max="1" step="0.02" value="0.6" />
+            </div>
+            <div class="field">
+              <label>Patience <span id="patienceValue">0.55</span></label>
+              <input type="range" id="patienceInput" min="0" max="1" step="0.02" value="0.55" />
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Demand Curve Preview</h3>
+          <p class="subtle">Uncertainty widens the distribution and shifts the confidence band.</p>
+          <div class="demand-preview">
+            <canvas id="demandCanvas" width="520" height="180"></canvas>
+            <div class="subtle" style="margin-top:10px;">Shaded band indicates demand uncertainty.</div>
+          </div>
+
+          <div class="metric-row">
+            <div class="metric">
+              <span class="subtle">Suggested Q*</span>
+              <strong id="qStar">--</strong>
+            </div>
+            <div class="metric">
+              <span class="subtle">Channel Efficiency
+                <button class="info-icon" type="button" data-tooltip="Channel efficiency = total negotiated profit divided by channel-optimal profit (Q*). 100% means fully coordinated.">i</button>
+              </span>
+              <strong id="efficiencyMetric">--</strong>
+            </div>
+            <div class="metric">
+              <span class="subtle">Behavioral Order Shift
+                <button class="info-icon" type="button" data-tooltip="Behavioral order shift shows how much bias-adjusted Q differs from the rational baseline. Positive = more aggressive ordering.">i</button>
+              </span>
+              <strong id="behaviorShift">--</strong>
+            </div>
+          </div>
+
+          <div class="field" style="margin-top:16px;">
+            <label>Role Selection</label>
+            <div class="role-grid" id="roleSelect">
+              <div class="role-card active" data-role="Buyer">
+                <strong>Buyer</strong>
+                <span>Electric blue lens</span>
+              </div>
+              <div class="role-card" data-role="Supplier">
+                <strong>Supplier</strong>
+                <span>Amber lens</span>
+              </div>
+              <div class="role-card" data-role="Instructor">
+                <strong>Instructor</strong>
+                <span>Full transparency</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="stage" id="stage-negotiation">
+      <div class="round-banner" id="roundBanner">
+        <div>Negotiation Round <strong id="roundCount">1</strong> of 4 <span class="subtle" id="roundStatus">Open</span></div>
+        <div>Time remaining: <strong id="roundTimer">02:00</strong></div>
+      </div>
+
+      <div class="negotiation-grid" style="margin-top:16px;">
+        <div class="card" data-panel="Buyer" style="position:relative;">
+          <div class="panel-title">
+            <h3>Buyer Panel</h3>
+            <span class="tag blue">Buyer View</span>
+          </div>
+          <div class="field">
+            <label>Order Quantity <span id="orderValue">220</span></label>
+            <input type="range" id="orderQty" min="80" max="400" step="5" value="220" />
+          </div>
+          <div class="field">
+            <label>Wholesale Price <span id="wholesaleValue">78</span></label>
+            <input type="range" id="wholesaleInput" min="40" max="140" step="1" value="78" />
+          </div>
+          <div class="field">
+            <label>Buyback Rate <span id="buybackValue">35</span></label>
+            <input type="range" id="buybackInput" min="0" max="80" step="1" value="35" />
+          </div>
+          <div class="field">
+            <label>Revenue Share <span id="shareValue">0.18</span></label>
+            <input type="range" id="shareInput" min="0" max="0.5" step="0.01" value="0.18" />
+          </div>
+          <div class="profit-card">
+            <span class="subtle">Expected Buyer Profit</span>
+            <strong id="retailerProfit">--</strong>
+          </div>
+          <button class="btn primary" id="retailerOffer">Submit Offer</button>
+          <div class="panel-overlay">Hidden in non-instructor mode. Switch roles or enable instructor mode to view.</div>
+        </div>
+
+        <div class="negotiation-center">
+          <div class="card">
+            <div class="panel-title">
+              <h3>Negotiation Table</h3>
+              <span class="tag emerald">Channel View</span>
+            </div>
+            <div class="field">
+              <label>Contract Type</label>
+              <select id="contractType">
+                <option value="wholesale">Wholesale</option>
+                <option value="buyback">Buyback</option>
+                <option value="revshare">Revenue Sharing</option>
+                <option value="option">Option</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Trust Meter <span id="trustScore">60</span></label>
+              <div class="meter"><span id="trustBar" style="width:60%;"></span></div>
+            </div>
+            <div class="field">
+              <label>Deadline Pressure <span id="deadlineValue">40</span></label>
+              <div class="meter"><span id="deadlineBar" style="width:40%;"></span></div>
+            </div>
+            <div class="field">
+              <label>Concession Graph</label>
+              <svg class="concession-chart" viewBox="0 0 320 120">
+                <polyline id="concessionLine" points="" fill="none" stroke="url(#gradBlue)" stroke-width="3" />
+                <defs>
+                  <linearGradient id="gradBlue" x1="0" x2="1">
+                    <stop offset="0%" stop-color="#4cc3ff" />
+                    <stop offset="100%" stop-color="#f4a62a" />
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
+          </div>
+
+          <div class="card" id="offerSummaryCard">
+            <div class="panel-title">
+              <h3>Current Offer Summary</h3>
+              <span class="subtle" id="offerStatus">Awaiting offer</span>
+            </div>
+            <div class="offer-summary">
+              <div class="summary-item">
+                <span class="subtle">Contract</span>
+                <strong id="summaryContract">Wholesale</strong>
+              </div>
+              <div class="summary-item">
+                <span class="subtle">Behavior-Adjusted Q</span>
+                <strong id="summaryQ">--</strong>
+              </div>
+              <div class="summary-item">
+                <span class="subtle">Wholesale (w)</span>
+                <strong id="summaryW">--</strong>
+              </div>
+              <div class="summary-item">
+                <span class="subtle">Buyback (b)</span>
+                <strong id="summaryB">--</strong>
+              </div>
+              <div class="summary-item">
+                <span class="subtle">Revenue Share (φ)</span>
+                <strong id="summaryShare">--</strong>
+              </div>
+              <div class="summary-item">
+                <span class="subtle">Option Premium (o)</span>
+                <strong id="summaryOption">--</strong>
+              </div>
+            </div>
+            <div class="offer-summary">
+              <div class="summary-item">
+                <span class="subtle">Expected Sales</span>
+                <strong id="summarySales">--</strong>
+              </div>
+              <div class="summary-item">
+                <span class="subtle">Expected Leftover</span>
+                <strong id="summaryLeftover">--</strong>
+              </div>
+              <div class="summary-item">
+                <span class="subtle">Service Level</span>
+                <strong id="summaryService">--</strong>
+              </div>
+              <div class="summary-item">
+                <span class="subtle">Stockout Risk</span>
+                <strong id="summaryStockout">--</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="panel-title">
+              <h3>Offer History</h3>
+              <span class="subtle">Latest at top</span>
+            </div>
+            <div class="timeline" id="offerHistory"></div>
+          </div>
+        </div>
+
+        <div class="card" data-panel="Supplier" style="position:relative;">
+          <div class="panel-title">
+            <h3>Supplier Panel</h3>
+            <span class="tag amber">Supplier View</span>
+          </div>
+          <div class="field">
+            <label>Option Premium <span id="optionValue">8</span></label>
+            <input type="range" id="optionInput" min="0" max="25" step="1" value="8" />
+          </div>
+          <div class="field">
+            <label>Wholesale Floor</label>
+            <input type="number" id="wholesaleFloor" value="70" />
+          </div>
+          <div class="field">
+            <label>Counter Offer Focus</label>
+            <select id="counterFocus">
+              <option>Margin Protection</option>
+              <option>Risk Sharing</option>
+              <option>Volume Expansion</option>
+            </select>
+          </div>
+          <div class="profit-card">
+            <span class="subtle">Expected Supplier Profit</span>
+            <strong id="supplierProfit">--</strong>
+          </div>
+          <button class="btn primary" id="supplierOffer">Counter Offer</button>
+          <div class="panel-overlay">Hidden in non-instructor mode. Switch roles or enable instructor mode to view.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="stage" id="stage-results">
+      <div class="card">
+        <h3>Simulation Results Dashboard</h3>
+        <p class="subtle">Use the tabs to explore profit, risk, behavioral impact, and contract comparisons.</p>
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="profit">Profit Analysis</button>
+          <button class="tab-btn" data-tab="risk">Risk Analysis</button>
+          <button class="tab-btn" data-tab="behavior">Behavioral Analysis</button>
+          <button class="tab-btn" data-tab="contracts">Contract Comparison</button>
+        </div>
+
+        <div class="tab-panel active" id="tab-profit">
+            <div class="metric-row">
+              <div class="metric">
+                <span class="subtle">Buyer Profit</span>
+                <strong id="resultRetailer">--</strong>
+              </div>
+              <div class="metric">
+                <span class="subtle">Supplier Profit</span>
+                <strong id="resultSupplier">--</strong>
+              </div>
+              <div class="metric">
+                <span class="subtle">Channel Profit</span>
+                <strong id="resultChannel">--</strong>
+              </div>
+            </div>
+            <div class="field" style="margin-top:16px;">
+              <label>Efficiency Gap <span id="efficiencyValue">--</span></label>
+              <div class="meter"><span id="efficiencyBar" style="width:50%;"></span></div>
+            </div>
+            <div class="waterfall">
+              <div class="bar">
+                <div class="bar-fill blue" id="barPotential" style="height:60%;"></div>
+                <span>Channel Potential</span>
+              </div>
+              <div class="bar">
+                <div class="bar-fill red" id="barLoss" style="height:20%;"></div>
+                <span>Double Marginalization Loss</span>
+              </div>
+              <div class="bar">
+                <div class="bar-fill emerald" id="barFinal" style="height:50%;"></div>
+                <span>Final Outcome</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-panel" id="tab-risk">
+            <div class="gauge-grid">
+              <div class="gauge">
+                <span class="subtle">Stockout Probability</span>
+                <svg viewBox="0 0 120 60">
+                  <path d="M10 50 A40 40 0 0 1 110 50" pathLength="100" stroke="rgba(255,255,255,0.12)" stroke-width="10" fill="none" />
+                  <path id="stockoutGauge" d="M10 50 A40 40 0 0 1 110 50" pathLength="100" stroke="var(--red)" stroke-width="10" fill="none" stroke-linecap="round" stroke-dasharray="45 100" />
+                </svg>
+                <div class="value" id="stockoutValue">--</div>
+              </div>
+              <div class="gauge">
+                <span class="subtle">Overstock Probability</span>
+                <svg viewBox="0 0 120 60">
+                  <path d="M10 50 A40 40 0 0 1 110 50" pathLength="100" stroke="rgba(255,255,255,0.12)" stroke-width="10" fill="none" />
+                  <path id="overstockGauge" d="M10 50 A40 40 0 0 1 110 50" pathLength="100" stroke="var(--amber)" stroke-width="10" fill="none" stroke-linecap="round" stroke-dasharray="35 100" />
+                </svg>
+                <div class="value" id="overstockValue">--</div>
+              </div>
+              <div class="gauge">
+                <span class="subtle">Profit Volatility</span>
+                <svg viewBox="0 0 120 60">
+                  <path d="M10 50 A40 40 0 0 1 110 50" pathLength="100" stroke="rgba(255,255,255,0.12)" stroke-width="10" fill="none" />
+                  <path id="volatilityGauge" d="M10 50 A40 40 0 0 1 110 50" pathLength="100" stroke="var(--blue)" stroke-width="10" fill="none" stroke-linecap="round" stroke-dasharray="40 100" />
+                </svg>
+                <div class="value" id="volatilityValue">--</div>
+              </div>
+            </div>
+            <div class="metric-row" style="margin-top:16px;">
+              <div class="metric">
+                <span class="subtle">5% Worst-Case Loss</span>
+                <strong id="cvarValue">--</strong>
+              </div>
+              <div class="metric">
+                <span class="subtle">Risk Balance Score</span>
+                <strong id="riskBalance">--</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-panel" id="tab-behavior">
+            <div class="metric">
+              <span class="subtle">Behavioral Diagnostics</span>
+              <strong id="behaviorHeadline">--</strong>
+              <div class="subtle" id="behaviorNarrative" style="margin-top:8px;"></div>
+            </div>
+            <div class="field" style="margin-top:16px;">
+              <label>Trust Evolution</label>
+              <svg class="concession-chart" viewBox="0 0 320 120">
+                <polyline id="trustLine" points="" fill="none" stroke="#23d18b" stroke-width="3" />
+              </svg>
+            </div>
+          </div>
+
+          <div class="tab-panel" id="tab-contracts">
+            <table>
+              <thead>
+                <tr>
+                  <th>Contract Type</th>
+                  <th>Buyer Profit</th>
+                  <th>Supplier Profit</th>
+                  <th>Total Profit</th>
+                  <th>Efficiency</th>
+                </tr>
+              </thead>
+              <tbody id="contractTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="stage" id="stage-reveal">
+      <div class="grid-2">
+        <div class="card">
+          <h3>Instructor Reveal Mode</h3>
+          <p class="subtle">Reveal the channel-optimal benchmark, Nash bargaining split, and value left on the table.</p>
+          <button class="btn primary" id="revealButton">Reveal Optimal Benchmark</button>
+          <div class="reveal-panel" id="revealPanel">
+            <div class="metric-row">
+              <div class="metric">
+                <span class="subtle">Channel-Optimal Q*</span>
+                <strong id="revealQ">--</strong>
+              </div>
+              <div class="metric">
+                <span class="subtle">Nash Split</span>
+                <strong id="revealNash">--</strong>
+              </div>
+              <div class="metric">
+                <span class="subtle">Value Left on Table</span>
+                <strong id="revealValue">--</strong>
+              </div>
+            </div>
+            <div class="field" style="margin-top:14px;">
+              <label>Pareto Frontier</label>
+              <div class="pareto">
+                <svg id="paretoChart" viewBox="0 0 320 240"></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Shock Injection</h3>
+          <p class="subtle">Introduce disruptions and test contract robustness in real time.</p>
+          <div class="pill-group" style="margin-top:12px;">
+            <button class="btn ghost" id="shockBoom">Demand Boom</button>
+            <button class="btn ghost" id="shockCrash">Demand Crash</button>
+            <button class="btn ghost" id="shockCapacity">Capacity Cut</button>
+            <button class="btn ghost" id="shockPenalty">Penalty Cost</button>
+          </div>
+          <div class="metric-row" style="margin-top:16px;">
+            <div class="metric">
+              <span class="subtle">Shock Status</span>
+              <strong id="shockStatus">None</strong>
+            </div>
+            <div class="metric">
+              <span class="subtle">Demand Shift</span>
+              <strong id="shockShift">0%</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div id="tooltip" class="tooltip" role="tooltip"></div>
+  </div>
+
+  <script>
+    const state = {
+      stage: "setup",
+      role: "Buyer",
+      instructor: false,
+      distribution: "Normal",
+      productType: "seasonal",
+      params: {
+        mean: 240,
+        variance: 40,
+        price: 120,
+        cost: 52,
+        salvage: 20,
+        wholesale: 78,
+        buyback: 35,
+        revShare: 0.18,
+        optionPremium: 8,
+        orderQty: 220
+      },
+      behavior: {
+        loss: 1.2,
+        risk: 1.1,
+        trust: 0.6,
+        patience: 0.55
+      },
+      contract: "wholesale",
+      offers: [],
+      round: 1,
+      roundTime: 120,
+      timer: null,
+      shock: {
+        label: "None",
+        shift: 0
+      }
+    };
+
+    const formatNumber = value => value.toLocaleString(undefined, { maximumFractionDigits: 0 });
+    const formatMoney = value => {
+      const sign = value < 0 ? "-" : "";
+      return `${sign}$${Math.abs(value).toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+    };
+    const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+
+    function erf(x) {
+      const sign = x >= 0 ? 1 : -1;
+      x = Math.abs(x);
+      const t = 1 / (1 + 0.5 * x);
+      const tau = t * Math.exp(
+        -x * x - 1.26551223 + 1.00002368 * t + 0.37409196 * t * t +
+        0.09678418 * Math.pow(t, 3) - 0.18628806 * Math.pow(t, 4) +
+        0.27886807 * Math.pow(t, 5) - 1.13520398 * Math.pow(t, 6) +
+        1.48851587 * Math.pow(t, 7) - 0.82215223 * Math.pow(t, 8) +
+        0.17087277 * Math.pow(t, 9)
+      );
+      return sign * (1 - tau);
+    }
+
+    function normalCDF(x) {
+      return 0.5 * (1 + erf(x / Math.sqrt(2)));
+    }
+
+    function normalPDF(x) {
+      return Math.exp(-0.5 * x * x) / Math.sqrt(2 * Math.PI);
+    }
+
+    function normalLoss(z) {
+      return normalPDF(z) - z * (1 - normalCDF(z));
+    }
+
+    function inverseNormal(p) {
+      if (p <= 0 || p >= 1) return 0;
+      const a = [
+        -3.969683028665376e+01,
+        2.209460984245205e+02,
+        -2.759285104469687e+02,
+        1.383577518672690e+02,
+        -3.066479806614716e+01,
+        2.506628277459239e+00
+      ];
+      const b = [
+        -5.447609879822406e+01,
+        1.615858368580409e+02,
+        -1.556989798598866e+02,
+        6.680131188771972e+01,
+        -1.328068155288572e+01
+      ];
+      const c = [
+        -7.784894002430293e-03,
+        -3.223964580411365e-01,
+        -2.400758277161838e+00,
+        -2.549732539343734e+00,
+        4.374664141464968e+00,
+        2.938163982698783e+00
+      ];
+      const d = [
+        7.784695709041462e-03,
+        3.224671290700398e-01,
+        2.445134137142996e+00,
+        3.754408661907416e+00
+      ];
+      const plow = 0.02425;
+      const phigh = 1 - plow;
+      let q;
+      if (p < plow) {
+        q = Math.sqrt(-2 * Math.log(p));
+        return (((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) /
+          ((((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1);
+      }
+      if (p > phigh) {
+        q = Math.sqrt(-2 * Math.log(1 - p));
+        return -(((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) /
+          ((((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1);
+      }
+      q = p - 0.5;
+      const r = q * q;
+      return (((((a[0] * r + a[1]) * r + a[2]) * r + a[3]) * r + a[4]) * r + a[5]) * q /
+        (((((b[0] * r + b[1]) * r + b[2]) * r + b[3]) * r + b[4]) * r + 1);
+    }
+
+    function createSeededRandom(seed) {
+      let value = seed % 4294967296;
+      return () => {
+        value = (value * 1664525 + 1013904223) % 4294967296;
+        return value / 4294967296;
+      };
+    }
+
+    function randomNormal(rand = Math.random) {
+      let u = 0;
+      let v = 0;
+      while (u === 0) u = rand();
+      while (v === 0) v = rand();
+      return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+    }
+
+    function sampleDemand(mean, sigma, rand = Math.random) {
+      const std = Math.max(0, sigma);
+      let demand;
+      if (state.distribution === "Uniform") {
+        const halfRange = Math.sqrt(3) * std;
+        demand = mean + (rand() * 2 - 1) * halfRange;
+      } else if (state.distribution === "Right-Skewed") {
+        if (mean <= 0) {
+          demand = mean + std * randomNormal(rand);
+        } else {
+          const variance = std * std;
+          const sigmaLog = Math.sqrt(Math.log(1 + variance / (mean * mean)));
+          const muLog = Math.log(mean) - 0.5 * sigmaLog * sigmaLog;
+          demand = Math.exp(muLog + sigmaLog * randomNormal(rand));
+        }
+      } else {
+        demand = mean + std * randomNormal(rand);
+      }
+      return Math.max(0, demand);
+    }
+
+    function quantile(values, q) {
+      const sorted = [...values].sort((a, b) => a - b);
+      const idx = Math.min(sorted.length - 1, Math.max(0, Math.floor(q * (sorted.length - 1))));
+      return sorted[idx];
+    }
+
+    function expectedSales(mu, sigma, Q) {
+      if (sigma < 0.0001) return Math.min(Q, mu);
+      const z = (Q - mu) / sigma;
+      const loss = normalLoss(z);
+      return mu - sigma * loss;
+    }
+
+    function computeBehaviorFactor() {
+      const { loss, risk, trust, patience } = state.behavior;
+      let factor = 1 - 0.08 * (loss - 1) - 0.06 * (risk - 1) + 0.04 * (trust - 0.5) + 0.03 * (patience - 0.5);
+      return clamp(factor, 0.75, 1.2);
+    }
+
+    function computeMetrics() {
+      const { mean, variance, price, cost, salvage, wholesale, buyback, revShare, optionPremium, orderQty } = state.params;
+      const sigma = variance;
+      const behaviorFactor = computeBehaviorFactor();
+      const effectiveQ = orderQty * behaviorFactor;
+      const seed = Math.floor((mean + variance + price + cost + salvage + wholesale + buyback + revShare * 100 + optionPremium + orderQty) * 1000) || 1;
+      const rand = createSeededRandom(seed);
+      const iterations = 3500;
+      const demands = new Array(iterations);
+      let salesSum = 0;
+      let leftoverSum = 0;
+      let stockouts = 0;
+      let overstocks = 0;
+
+      const sums = {
+        wholesale: { retailer: 0, supplier: 0 },
+        buyback: { retailer: 0, supplier: 0 },
+        revshare: { retailer: 0, supplier: 0 },
+        option: { retailer: 0, supplier: 0 }
+      };
+
+      let selectedSum = 0;
+      let selectedSumSq = 0;
+      const selectedTotals = [];
+
+      const wholesaleSupplierBase = (wholesale - cost) * effectiveQ;
+      const wholesaleBuyerBase = -wholesale * effectiveQ;
+      const revshareSupplierBase = (wholesale - cost) * effectiveQ;
+      const revshareBuyerBase = -wholesale * effectiveQ;
+      const buybackBuyerBase = -wholesale * effectiveQ;
+      const optionBuyerBase = -optionPremium * effectiveQ;
+
+      for (let i = 0; i < iterations; i++) {
+        const demand = sampleDemand(mean, sigma, rand);
+        demands[i] = demand;
+        const sales = Math.min(demand, effectiveQ);
+        const leftover = Math.max(effectiveQ - demand, 0);
+        salesSum += sales;
+        leftoverSum += leftover;
+        if (demand > effectiveQ) stockouts += 1;
+        if (demand < effectiveQ) overstocks += 1;
+
+        const wholesaleRetailer = price * sales + salvage * leftover + wholesaleBuyerBase;
+        const wholesaleSupplier = wholesaleSupplierBase;
+
+        const buybackRetailer = price * sales + buyback * leftover + buybackBuyerBase;
+        const buybackSupplier = wholesaleSupplierBase + (salvage - buyback) * leftover;
+
+        const revShareRetailer = (1 - revShare) * price * sales + salvage * leftover + revshareBuyerBase;
+        const revShareSupplier = revshareSupplierBase + revShare * price * sales;
+
+        const optionRetailer = price * sales - wholesale * sales + optionBuyerBase;
+        const optionSupplier = optionPremium * effectiveQ + wholesale * sales + salvage * (effectiveQ - sales) - cost * effectiveQ;
+
+        sums.wholesale.retailer += wholesaleRetailer;
+        sums.wholesale.supplier += wholesaleSupplier;
+        sums.buyback.retailer += buybackRetailer;
+        sums.buyback.supplier += buybackSupplier;
+        sums.revshare.retailer += revShareRetailer;
+        sums.revshare.supplier += revShareSupplier;
+        sums.option.retailer += optionRetailer;
+        sums.option.supplier += optionSupplier;
+
+        let selectedTotal = 0;
+        if (state.contract === "wholesale") selectedTotal = wholesaleRetailer + wholesaleSupplier;
+        if (state.contract === "buyback") selectedTotal = buybackRetailer + buybackSupplier;
+        if (state.contract === "revshare") selectedTotal = revShareRetailer + revShareSupplier;
+        if (state.contract === "option") selectedTotal = optionRetailer + optionSupplier;
+
+        selectedSum += selectedTotal;
+        selectedSumSq += selectedTotal * selectedTotal;
+        selectedTotals.push(selectedTotal);
+      }
+
+      const expectedSales = salesSum / iterations;
+      const expectedLeftover = leftoverSum / iterations;
+      const stockoutProb = stockouts / iterations;
+      const overstockProb = overstocks / iterations;
+
+      const meanProfit = selectedSum / iterations;
+      const varianceProfit = Math.max(0, selectedSumSq / iterations - meanProfit * meanProfit);
+      const volatility = Math.sqrt(varianceProfit);
+
+      const sortedTotals = [...selectedTotals].sort((a, b) => a - b);
+      const tailCount = Math.max(1, Math.floor(iterations * 0.05));
+      const avgWorst = sortedTotals.slice(0, tailCount).reduce((sum, value) => sum + value, 0) / tailCount;
+      const worstLoss = meanProfit - avgWorst;
+      const cvar = -Math.abs(worstLoss);
+
+      const criticalRatio = clamp((price - cost) / Math.max(1, price - salvage), 0.01, 0.99);
+      const qStar = state.distribution === "Normal"
+        ? Math.max(0, mean + inverseNormal(criticalRatio) * sigma)
+        : Math.max(0, quantile(demands, criticalRatio));
+
+      let channelOptimalProfit = 0;
+      for (let i = 0; i < iterations; i++) {
+        const demand = demands[i];
+        const salesOpt = Math.min(demand, qStar);
+        const leftoverOpt = Math.max(qStar - demand, 0);
+        channelOptimalProfit += price * salesOpt + salvage * leftoverOpt - cost * qStar;
+      }
+      channelOptimalProfit = channelOptimalProfit / iterations;
+
+      return {
+        behaviorFactor,
+        effectiveQ,
+        expectedSales,
+        expectedLeftover,
+        serviceLevel: 1 - stockoutProb,
+        qStar,
+        channelOptimalProfit,
+        stockoutProb,
+        overstockProb,
+        volatility,
+        cvar,
+        wholesale: {
+          retailer: sums.wholesale.retailer / iterations,
+          supplier: sums.wholesale.supplier / iterations
+        },
+        buyback: {
+          retailer: sums.buyback.retailer / iterations,
+          supplier: sums.buyback.supplier / iterations
+        },
+        revshare: {
+          retailer: sums.revshare.retailer / iterations,
+          supplier: sums.revshare.supplier / iterations
+        },
+        option: {
+          retailer: sums.option.retailer / iterations,
+          supplier: sums.option.supplier / iterations
+        }
+      };
+    }
+
+    function updateDemandCurve() {
+      const canvas = document.getElementById("demandCanvas");
+      const ctx = canvas.getContext("2d");
+      const width = canvas.width;
+      const height = canvas.height;
+      ctx.clearRect(0, 0, width, height);
+
+      const { mean, variance } = state.params;
+      const sigma = variance;
+      const varianceValue = sigma * sigma;
+      const lognormalReady = state.distribution === "Right-Skewed" && mean > 0;
+      const sigmaLog = lognormalReady ? Math.sqrt(Math.log(1 + varianceValue / (mean * mean))) : 0;
+      const muLog = lognormalReady ? Math.log(mean) - 0.5 * sigmaLog * sigmaLog : 0;
+      const maxX = mean + sigma * 3;
+      const minX = Math.max(0, mean - sigma * 3);
+
+      ctx.fillStyle = "rgba(76,195,255,0.08)";
+      ctx.strokeStyle = "rgba(76,195,255,0.6)";
+      ctx.lineWidth = 2;
+
+      ctx.beginPath();
+      for (let i = 0; i <= 100; i++) {
+        const xVal = minX + (maxX - minX) * (i / 100);
+        let y;
+        if (state.distribution === "Uniform") {
+          y = 1;
+        } else if (state.distribution === "Right-Skewed") {
+          if (!lognormalReady || xVal <= 0 || sigmaLog === 0) {
+            y = 0;
+          } else {
+            const z = (Math.log(xVal) - muLog) / sigmaLog;
+            y = Math.exp(-0.5 * z * z) / (xVal * sigmaLog * Math.sqrt(2 * Math.PI));
+          }
+        } else {
+          const z = (xVal - mean) / sigma;
+          y = Math.exp(-0.5 * z * z);
+        }
+        const x = (i / 100) * width;
+        const yScaled = height - y * height * 0.9;
+        if (i === 0) {
+          ctx.moveTo(x, height);
+          ctx.lineTo(x, yScaled);
+        } else {
+          ctx.lineTo(x, yScaled);
+        }
+      }
+      ctx.lineTo(width, height);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.beginPath();
+      for (let i = 0; i <= 100; i++) {
+        const xVal = minX + (maxX - minX) * (i / 100);
+        let y;
+        if (state.distribution === "Uniform") {
+          y = 1;
+        } else if (state.distribution === "Right-Skewed") {
+          if (!lognormalReady || xVal <= 0 || sigmaLog === 0) {
+            y = 0;
+          } else {
+            const z = (Math.log(xVal) - muLog) / sigmaLog;
+            y = Math.exp(-0.5 * z * z) / (xVal * sigmaLog * Math.sqrt(2 * Math.PI));
+          }
+        } else {
+          const z = (xVal - mean) / sigma;
+          y = Math.exp(-0.5 * z * z);
+        }
+        const x = (i / 100) * width;
+        const yScaled = height - y * height * 0.9;
+        if (i === 0) {
+          ctx.moveTo(x, yScaled);
+        } else {
+          ctx.lineTo(x, yScaled);
+        }
+      }
+      ctx.stroke();
+    }
+
+    function updateNegotiationPanels(metrics) {
+      const contract = metrics[state.contract];
+      const retailerProfit = contract.retailer;
+      const supplierProfit = contract.supplier;
+      document.getElementById("retailerProfit").textContent = formatMoney(retailerProfit);
+      document.getElementById("supplierProfit").textContent = formatMoney(supplierProfit);
+
+      const trustScore = Math.round(state.behavior.trust * 100);
+      document.getElementById("trustScore").textContent = trustScore;
+      document.getElementById("trustBar").style.width = `${trustScore}%`;
+
+      const hiddenPanels = document.querySelectorAll("[data-panel]");
+      hiddenPanels.forEach(panel => {
+        const panelRole = panel.getAttribute("data-panel");
+        if (state.instructor || state.role === panelRole) {
+          panel.classList.remove("panel-hidden");
+        } else {
+          panel.classList.add("panel-hidden");
+        }
+      });
+    }
+
+    function updateOfferSummary(metrics) {
+      const contractLabels = {
+        wholesale: "Wholesale",
+        buyback: "Buyback",
+        revshare: "Revenue Sharing",
+        option: "Option"
+      };
+      document.getElementById("summaryContract").textContent = contractLabels[state.contract];
+      document.getElementById("summaryQ").textContent = formatNumber(metrics.effectiveQ);
+      document.getElementById("summaryW").textContent = formatMoney(state.params.wholesale);
+      document.getElementById("summaryB").textContent = formatMoney(state.params.buyback);
+      document.getElementById("summaryShare").textContent = `${(state.params.revShare * 100).toFixed(0)}%`;
+      document.getElementById("summaryOption").textContent = formatMoney(state.params.optionPremium);
+      document.getElementById("summarySales").textContent = formatNumber(metrics.expectedSales);
+      document.getElementById("summaryLeftover").textContent = formatNumber(metrics.expectedLeftover);
+      document.getElementById("summaryService").textContent = `${(metrics.serviceLevel * 100).toFixed(1)}%`;
+      document.getElementById("summaryStockout").textContent = `${(metrics.stockoutProb * 100).toFixed(1)}%`;
+    }
+
+    function setRole(role) {
+      state.role = role;
+      document.querySelectorAll("#roleSelect .role-card").forEach(card => {
+        card.classList.toggle("active", card.dataset.role === role);
+      });
+      document.querySelectorAll("#topRoleToggle .role-btn").forEach(button => {
+        button.classList.toggle("active", button.dataset.role === role);
+      });
+      state.instructor = role === "Instructor" ? true : state.instructor;
+      if (role !== "Instructor") {
+        state.instructor = false;
+      }
+      document.getElementById("toggleInstructor").textContent = `Instructor Mode: ${state.instructor ? "On" : "Off"}`;
+      refresh();
+    }
+
+    function updateResults(metrics) {
+      const contract = metrics[state.contract];
+      const total = contract.retailer + contract.supplier;
+      const efficiency = metrics.channelOptimalProfit !== 0 ? total / metrics.channelOptimalProfit : 0;
+      const efficiencyPct = clamp(efficiency * 100, 0, 120);
+
+      document.getElementById("resultRetailer").textContent = formatMoney(contract.retailer);
+      document.getElementById("resultSupplier").textContent = formatMoney(contract.supplier);
+      document.getElementById("resultChannel").textContent = formatMoney(total);
+
+      document.getElementById("efficiencyValue").textContent = `${efficiencyPct.toFixed(1)}%`;
+      document.getElementById("efficiencyBar").style.width = `${efficiencyPct}%`;
+
+      document.getElementById("barPotential").style.height = "100%";
+      const lossHeight = clamp(100 - efficiencyPct, 5, 70);
+      document.getElementById("barLoss").style.height = `${lossHeight}%`;
+      document.getElementById("barFinal").style.height = `${clamp(efficiencyPct, 20, 100)}%`;
+
+      document.getElementById("stockoutGauge").setAttribute("stroke-dasharray", `${metrics.stockoutProb * 100} 100`);
+      document.getElementById("overstockGauge").setAttribute("stroke-dasharray", `${metrics.overstockProb * 100} 100`);
+      const volatilityPct = clamp((metrics.volatility / Math.max(1, Math.abs(total))) * 100, 5, 100);
+      document.getElementById("volatilityGauge").setAttribute("stroke-dasharray", `${volatilityPct} 100`);
+
+      document.getElementById("stockoutValue").textContent = `${(metrics.stockoutProb * 100).toFixed(1)}%`;
+      document.getElementById("overstockValue").textContent = `${(metrics.overstockProb * 100).toFixed(1)}%`;
+      document.getElementById("volatilityValue").textContent = formatMoney(metrics.volatility);
+
+      document.getElementById("cvarValue").textContent = formatMoney(metrics.cvar);
+      const riskBalance = 100 - Math.abs(metrics.stockoutProb - metrics.overstockProb) * 100;
+      document.getElementById("riskBalance").textContent = `${riskBalance.toFixed(1)}%`;
+
+      updateBehaviorNarrative(contract, total);
+      updateContractTable(metrics);
+      updateTrustEvolution();
+    }
+
+    function updateBehaviorNarrative(contract, total) {
+      const { loss, risk, trust, patience } = state.behavior;
+      const notes = [];
+      if (loss > 1.3) notes.push("Buyer exhibits strong loss aversion, suppressing order quantities.");
+      if (risk > 1.25) notes.push("Risk aversion is elevated, raising demand for safety in contract terms.");
+      if (trust < 0.45) notes.push("Low trust slows concessions and widens the negotiation gap.");
+      if (patience < 0.45) notes.push("Low patience increases deadline pressure and early settlement bias.");
+      if (notes.length === 0) notes.push("Behavioral signals are balanced, keeping decisions near rational benchmarks.");
+
+      const supplierShare = total > 0 ? (contract.supplier / total) * 100 : 0;
+      document.getElementById("behaviorHeadline").textContent = `Supplier captured ${supplierShare.toFixed(0)}% of channel profit.`;
+      document.getElementById("behaviorNarrative").textContent = notes.join(" ");
+    }
+
+    function updateContractTable(metrics) {
+      const contractData = [
+        { key: "wholesale", label: "Wholesale" },
+        { key: "buyback", label: "Buyback" },
+        { key: "revshare", label: "Revenue Share" },
+        { key: "option", label: "Option" }
+      ];
+      const tbody = document.getElementById("contractTable");
+      tbody.innerHTML = "";
+      let best = { efficiency: -Infinity, key: null };
+      contractData.forEach(item => {
+        const contract = metrics[item.key];
+        const total = contract.retailer + contract.supplier;
+        const efficiency = total / metrics.channelOptimalProfit;
+        if (efficiency > best.efficiency) best = { efficiency, key: item.key };
+      });
+      contractData.forEach(item => {
+        const contract = metrics[item.key];
+        const total = contract.retailer + contract.supplier;
+        const efficiency = total / metrics.channelOptimalProfit;
+        const row = document.createElement("tr");
+        if (item.key === best.key) row.classList.add("highlight");
+        row.innerHTML = `
+          <td>${item.label}</td>
+          <td>${formatMoney(contract.retailer)}</td>
+          <td>${formatMoney(contract.supplier)}</td>
+          <td>${formatMoney(total)}</td>
+          <td>${(efficiency * 100).toFixed(1)}%</td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    function updateTrustEvolution() {
+      const line = document.getElementById("trustLine");
+      const base = state.behavior.trust * 100;
+      const points = [];
+      for (let i = 0; i < 6; i++) {
+        const x = 20 + i * 50;
+        const y = 100 - (base + (i - 3) * 4 + Math.sin(i) * 6);
+        points.push(`${x},${clamp(y, 30, 100)}`);
+      }
+      line.setAttribute("points", points.join(" "));
+    }
+
+    function updateConcessionGraph() {
+      const line = document.getElementById("concessionLine");
+      const offerPoints = state.offers.filter(offer => !offer.type);
+      if (offerPoints.length === 0) {
+        line.setAttribute("points", "");
+        return;
+      }
+      const points = offerPoints.slice(0, 6).reverse().map((offer, idx) => {
+        const x = 20 + idx * 50;
+        const y = 100 - clamp((offer.wholesale - 40) / 100 * 90, 10, 90);
+        return `${x},${y}`;
+      });
+      line.setAttribute("points", points.join(" "));
+    }
+
+    function updateReveal(metrics) {
+      document.getElementById("revealQ").textContent = formatNumber(metrics.qStar);
+      const nashSplit = metrics.channelOptimalProfit / 2;
+      document.getElementById("revealNash").textContent = `${formatMoney(nashSplit)} / ${formatMoney(nashSplit)}`;
+      const contract = metrics[state.contract];
+      const total = contract.retailer + contract.supplier;
+      const valueLeft = metrics.channelOptimalProfit - total;
+      document.getElementById("revealValue").textContent = formatMoney(valueLeft);
+      updatePareto(metrics);
+    }
+
+    function updatePareto(metrics) {
+      const chart = document.getElementById("paretoChart");
+      const points = [];
+      const minRetailer = 0;
+      const minSupplier = 0;
+      const maxRetailer = Math.max(1, metrics.channelOptimalProfit);
+      const maxSupplier = Math.max(1, metrics.channelOptimalProfit);
+      for (let i = 0; i <= 12; i++) {
+        const share = i / 12;
+        const retailer = metrics.channelOptimalProfit * share;
+        const supplier = metrics.channelOptimalProfit * (1 - share);
+        points.push({ retailer, supplier });
+      }
+      chart.innerHTML = `
+        <rect x="30" y="20" width="260" height="180" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.08)" />
+        <text x="30" y="15" fill="#a7b0c0" font-size="10">Supplier Profit</text>
+        <text x="200" y="230" fill="#a7b0c0" font-size="10">Buyer Profit</text>
+      `;
+      points.forEach(point => {
+        const x = 30 + (point.retailer / maxRetailer) * 260;
+        const y = 200 - (point.supplier / maxSupplier) * 180;
+        chart.innerHTML += `<circle cx="${x}" cy="${y}" r="4" fill="#23d18b" />`;
+      });
+      const current = metrics[state.contract];
+      const currentTotal = current.retailer + current.supplier;
+      const x = 30 + (current.retailer / metrics.channelOptimalProfit) * 260;
+      const y = 200 - (current.supplier / metrics.channelOptimalProfit) * 180;
+      chart.innerHTML += `<circle cx="${x}" cy="${y}" r="6" fill="#ff5c5c" />`;
+    }
+
+    function addOffer(role) {
+      const now = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      state.offers.unshift({
+        role,
+        time: now,
+        wholesale: state.params.wholesale,
+        orderQty: state.params.orderQty,
+        buyback: state.params.buyback,
+        revShare: state.params.revShare,
+        optionPremium: state.params.optionPremium,
+        contract: state.contract
+      });
+      closeRound(role, now);
+      if (state.offers.length > 10) state.offers.pop();
+      document.getElementById("offerStatus").textContent = `Last offer by ${role} @ ${now}`;
+      renderOffers();
+      updateConcessionGraph();
+      state.behavior.trust = clamp(state.behavior.trust + (role === "Buyer" ? 0.02 : -0.01), 0, 1);
+      document.getElementById("trustInput").value = state.behavior.trust.toFixed(2);
+      document.getElementById("trustValue").textContent = state.behavior.trust.toFixed(2);
+      refresh();
+    }
+
+    function closeRound(triggerRole, timeLabel) {
+      const closedRound = state.round;
+      state.offers.unshift({
+        type: "system",
+        message: `Round ${closedRound} closed by ${triggerRole}`,
+        time: timeLabel
+      });
+      state.round = closedRound >= 4 ? 1 : closedRound + 1;
+      state.roundTime = 120;
+      const banner = document.getElementById("roundBanner");
+      banner.classList.add("round-flash");
+      setTimeout(() => banner.classList.remove("round-flash"), 600);
+      document.getElementById("roundStatus").textContent = `Closed by ${triggerRole}`;
+      setTimeout(() => {
+        document.getElementById("roundStatus").textContent = "Open";
+      }, 1500);
+      updateRoundTimer();
+    }
+
+    function renderOffers() {
+      const container = document.getElementById("offerHistory");
+      container.innerHTML = "";
+      state.offers.forEach(offer => {
+        const item = document.createElement("div");
+        item.className = "timeline-item";
+        if (offer.type === "system") {
+          item.innerHTML = `
+            <strong>${offer.message}</strong>
+            <div class="subtle">${offer.time}</div>
+          `;
+        } else {
+          item.innerHTML = `
+            <strong>${offer.role} ${offer.contract.toUpperCase()}</strong>
+            <div>Wholesale: $${offer.wholesale} | Q: ${offer.orderQty}</div>
+            <div>Buyback: $${offer.buyback} | RevShare: ${(offer.revShare * 100).toFixed(0)}% | Option: $${offer.optionPremium}</div>
+            <div class="subtle">${offer.time}</div>
+          `;
+        }
+        container.appendChild(item);
+      });
+    }
+
+    function updateStage(stage) {
+      state.stage = stage;
+      document.querySelectorAll(".stage").forEach(section => {
+        section.classList.toggle("active", section.id === `stage-${stage}`);
+      });
+      document.querySelectorAll(".stage-pill").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.stage === stage);
+      });
+      if (stage === "negotiation") {
+        document.getElementById("roundStatus").textContent = "Open";
+        startRoundTimer();
+      }
+    }
+
+    function startRoundTimer() {
+      if (state.timer) return;
+      state.timer = setInterval(() => {
+        if (state.stage !== "negotiation") return;
+        state.roundTime -= 1;
+        if (state.roundTime <= 0) {
+          closeRound("Timer", new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }));
+          return;
+        }
+        updateRoundTimer();
+      }, 1000);
+    }
+
+    function updateRoundTimer() {
+      const minutes = String(Math.floor(state.roundTime / 60)).padStart(2, "0");
+      const seconds = String(state.roundTime % 60).padStart(2, "0");
+      document.getElementById("roundTimer").textContent = `${minutes}:${seconds}`;
+      document.getElementById("roundCount").textContent = state.round;
+      const pressure = clamp(100 - (state.roundTime / 120) * 100, 0, 100);
+      document.getElementById("deadlineValue").textContent = `${Math.round(pressure)}%`;
+      document.getElementById("deadlineBar").style.width = `${pressure}%`;
+    }
+
+    function refresh() {
+      const metrics = computeMetrics();
+      updateDemandCurve();
+      updateNegotiationPanels(metrics);
+      updateOfferSummary(metrics);
+      updateResults(metrics);
+      updateReveal(metrics);
+      document.getElementById("qStar").textContent = formatNumber(metrics.qStar);
+      const efficiency = metrics.channelOptimalProfit !== 0
+        ? (metrics[state.contract].retailer + metrics[state.contract].supplier) / metrics.channelOptimalProfit * 100
+        : 0;
+      document.getElementById("efficiencyMetric").textContent = `${efficiency.toFixed(1)}%`;
+      const shift = (metrics.behaviorFactor - 1) * 100;
+      const shiftLabel = shift >= 0 ? `+${shift.toFixed(0)}%` : `${shift.toFixed(0)}%`;
+      document.getElementById("behaviorShift").textContent = shiftLabel;
+    }
+
+    function updateScenarioValues() {
+      document.getElementById("demandMeanValue").textContent = state.params.mean;
+      document.getElementById("demandVarValue").textContent = state.params.variance;
+      document.getElementById("distributionValue").textContent = state.distribution;
+      document.getElementById("demandMean").value = state.params.mean;
+      document.getElementById("demandVar").value = state.params.variance;
+      document.getElementById("demandMeanInput").value = state.params.mean;
+      document.getElementById("demandVarInput").value = state.params.variance;
+      document.getElementById("lossValue").textContent = state.behavior.loss.toFixed(2);
+      document.getElementById("riskValue").textContent = state.behavior.risk.toFixed(2);
+      document.getElementById("trustValue").textContent = state.behavior.trust.toFixed(2);
+      document.getElementById("patienceValue").textContent = state.behavior.patience.toFixed(2);
+      document.getElementById("orderValue").textContent = state.params.orderQty;
+      document.getElementById("wholesaleValue").textContent = state.params.wholesale;
+      document.getElementById("buybackValue").textContent = state.params.buyback;
+      document.getElementById("shareValue").textContent = state.params.revShare.toFixed(2);
+      document.getElementById("optionValue").textContent = state.params.optionPremium;
+    }
+
+    function bindInputs() {
+      document.getElementById("demandMean").addEventListener("input", e => {
+        state.params.mean = Number(e.target.value);
+        updateScenarioValues();
+        refresh();
+      });
+      document.getElementById("demandMeanInput").addEventListener("input", e => {
+        e.target.value = e.target.value.replace(/[^0-9]/g, "");
+        const value = Number(e.target.value);
+        if (Number.isNaN(value)) return;
+        state.params.mean = clamp(Math.round(value), 80, 400);
+        updateScenarioValues();
+        refresh();
+      });
+      document.getElementById("demandVar").addEventListener("input", e => {
+        state.params.variance = Number(e.target.value);
+        updateScenarioValues();
+        refresh();
+      });
+      document.getElementById("demandVarInput").addEventListener("input", e => {
+        e.target.value = e.target.value.replace(/[^0-9]/g, "");
+        const value = Number(e.target.value);
+        if (Number.isNaN(value)) return;
+        state.params.variance = clamp(Math.round(value), 10, 120);
+        updateScenarioValues();
+        refresh();
+      });
+      document.getElementById("distribution").addEventListener("change", e => {
+        state.distribution = e.target.value;
+        updateScenarioValues();
+        refresh();
+      });
+      document.getElementById("priceInput").addEventListener("input", e => {
+        state.params.price = Number(e.target.value);
+        refresh();
+      });
+      document.getElementById("costInput").addEventListener("input", e => {
+        state.params.cost = Number(e.target.value);
+        refresh();
+      });
+      document.getElementById("salvageInput").addEventListener("input", e => {
+        state.params.salvage = Number(e.target.value);
+        refresh();
+      });
+      document.getElementById("lossInput").addEventListener("input", e => {
+        state.behavior.loss = Number(e.target.value);
+        updateScenarioValues();
+        refresh();
+      });
+      document.getElementById("riskInput").addEventListener("input", e => {
+        state.behavior.risk = Number(e.target.value);
+        updateScenarioValues();
+        refresh();
+      });
+      document.getElementById("trustInput").addEventListener("input", e => {
+        state.behavior.trust = Number(e.target.value);
+        updateScenarioValues();
+        refresh();
+      });
+      document.getElementById("patienceInput").addEventListener("input", e => {
+        state.behavior.patience = Number(e.target.value);
+        updateScenarioValues();
+        refresh();
+      });
+      document.getElementById("orderQty").addEventListener("input", e => {
+        state.params.orderQty = Number(e.target.value);
+        updateScenarioValues();
+        refresh();
+      });
+      document.getElementById("wholesaleInput").addEventListener("input", e => {
+        state.params.wholesale = Number(e.target.value);
+        updateScenarioValues();
+        refresh();
+      });
+      document.getElementById("buybackInput").addEventListener("input", e => {
+        state.params.buyback = Number(e.target.value);
+        updateScenarioValues();
+        refresh();
+      });
+      document.getElementById("shareInput").addEventListener("input", e => {
+        state.params.revShare = Number(e.target.value);
+        updateScenarioValues();
+        refresh();
+      });
+      document.getElementById("optionInput").addEventListener("input", e => {
+        state.params.optionPremium = Number(e.target.value);
+        updateScenarioValues();
+        refresh();
+      });
+      document.getElementById("contractType").addEventListener("change", e => {
+        state.contract = e.target.value;
+        refresh();
+      });
+      document.getElementById("retailerOffer").addEventListener("click", () => addOffer("Buyer"));
+      document.getElementById("supplierOffer").addEventListener("click", () => addOffer("Supplier"));
+
+      document.querySelectorAll(".stage-pill").forEach(btn => {
+        btn.addEventListener("click", () => updateStage(btn.dataset.stage));
+      });
+
+      document.querySelectorAll("#topRoleToggle .role-btn").forEach(button => {
+        button.addEventListener("click", () => setRole(button.dataset.role));
+      });
+
+      document.getElementById("toggleInstructor").addEventListener("click", () => {
+        state.instructor = !state.instructor;
+        if (state.role === "Instructor") state.instructor = true;
+        document.getElementById("toggleInstructor").textContent = `Instructor Mode: ${state.instructor ? "On" : "Off"}`;
+        refresh();
+      });
+
+      document.getElementById("resetApp").addEventListener("click", () => {
+        const confirmed = window.confirm("Are you sure you want to restart the lab?");
+        if (confirmed) window.location.reload();
+      });
+
+      document.getElementById("exportPdf").addEventListener("click", () => window.print());
+
+      document.querySelectorAll("#roleSelect .role-card").forEach(card => {
+        card.addEventListener("click", () => {
+          setRole(card.dataset.role);
+        });
+      });
+
+      document.querySelectorAll("#productType button").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll("#productType button").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          state.productType = btn.dataset.type;
+          if (state.productType === "stable") state.params.variance = 25;
+          if (state.productType === "uncertain") state.params.variance = 80;
+          if (state.productType === "seasonal") state.params.variance = 40;
+          document.getElementById("demandVar").value = state.params.variance;
+          updateScenarioValues();
+          refresh();
+        });
+      });
+
+      document.querySelectorAll(".tab-btn").forEach(tab => {
+        tab.addEventListener("click", () => {
+          document.querySelectorAll(".tab-btn").forEach(t => t.classList.remove("active"));
+          document.querySelectorAll(".tab-panel").forEach(panel => panel.classList.remove("active"));
+          tab.classList.add("active");
+          document.getElementById(`tab-${tab.dataset.tab}`).classList.add("active");
+        });
+      });
+
+      document.getElementById("revealButton").addEventListener("click", () => {
+        document.getElementById("revealPanel").classList.toggle("active");
+      });
+
+      document.getElementById("shockBoom").addEventListener("click", () => applyShock("Demand Boom", 0.25));
+      document.getElementById("shockCrash").addEventListener("click", () => applyShock("Demand Crash", -0.3));
+      document.getElementById("shockCapacity").addEventListener("click", () => applyShock("Capacity Cut", -0.15, true));
+      document.getElementById("shockPenalty").addEventListener("click", () => applyShock("Penalty Cost", 0, false, 15));
+    }
+
+    function bindTooltips() {
+      const tooltip = document.getElementById("tooltip");
+      let timer = null;
+
+      const showTooltip = target => {
+        tooltip.textContent = target.dataset.tooltip;
+        const rect = target.getBoundingClientRect();
+        const left = clamp(rect.left + rect.width / 2, 24, window.innerWidth - 24);
+        tooltip.style.left = `${left}px`;
+        tooltip.style.top = `${rect.bottom + 10}px`;
+        tooltip.classList.add("visible");
+      };
+
+      const hideTooltip = () => {
+        tooltip.classList.remove("visible");
+      };
+
+      document.querySelectorAll(".info-icon").forEach(icon => {
+        icon.addEventListener("mouseenter", () => {
+          timer = setTimeout(() => showTooltip(icon), 1000);
+        });
+        icon.addEventListener("mouseleave", () => {
+          clearTimeout(timer);
+          hideTooltip();
+        });
+        icon.addEventListener("focus", () => {
+          timer = setTimeout(() => showTooltip(icon), 1000);
+        });
+        icon.addEventListener("blur", () => {
+          clearTimeout(timer);
+          hideTooltip();
+        });
+      });
+    }
+
+    function applyShock(label, shift, capacityCut = false, penalty = 0) {
+      state.shock.label = label;
+      state.shock.shift = shift;
+      state.params.mean = Math.round(state.params.mean * (1 + shift));
+      if (capacityCut) state.params.orderQty = Math.round(state.params.orderQty * 0.8);
+      if (penalty > 0) state.params.cost += penalty;
+      document.getElementById("shockStatus").textContent = label;
+      document.getElementById("shockShift").textContent = `${(shift * 100).toFixed(0)}%`;
+      document.getElementById("demandMean").value = state.params.mean;
+      document.getElementById("orderQty").value = state.params.orderQty;
+      document.getElementById("costInput").value = state.params.cost;
+      updateScenarioValues();
+      refresh();
+    }
+
+    updateScenarioValues();
+    bindInputs();
+    bindTooltips();
+    setRole(state.role);
+    updateRoundTimer();
+  </script>
+</body>
+</html>
